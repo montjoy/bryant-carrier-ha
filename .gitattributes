@@ -1,0 +1,14 @@
+# The s6 service scripts and everything else that runs inside the add-on image
+# must keep LF endings.  A CRLF checkout on Windows turns the shebang into
+# "/command/with-contenv bashio\r", and the container fails with a bad
+# interpreter error that gives no hint about the cause.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+
+# s6-rc reads these literally; they have no extension to match on.
+infinitive/rootfs/etc/s6-overlay/s6-rc.d/**/type text eol=lf
+infinitive/rootfs/etc/s6-overlay/s6-rc.d/**/run text eol=lf
+infinitive/rootfs/etc/s6-overlay/s6-rc.d/**/finish text eol=lf

@@ -1,0 +1,82 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+#
+# Start the Infinitive daemon.
+#
+# The previous version parsed /data/options.json with raw jq, then launched the
+# binary without exec -- so the shell stayed as PID 1 of the service and SIGTERM
+# never reached the daemon on stop.
+
+set -e
+
+SERIAL=$(bashio::config 'serial')
+LOG_LEVEL=$(bashio::config 'log_level')
+ZONE=$(bashio::config 'zone')
+MIN_SETPOINT=$(bashio::config 'min_setpoint')
+MAX_SETPOINT=$(bashio::config 'max_setpoint')
+MIN_SPREAD=$(bashio::config 'min_setpoint_spread')
+DEVICE_NAME=$(bashio::config 'device_name')
+DISCOVERY_PREFIX=$(bashio::config 'discovery_prefix')
+TOPIC_PREFIX=$(bashio::config 'topic_prefix')
+NODE_ID=$(bashio::config 'node_id')
+
+# Fail loudly and early rather than letting the daemon panic on an open() of a
+# device that is not there.  A renumbered /dev/ttyUSB* is the single most common
+# way this add-on stops working after a reboot.
+if ! bashio::fs.device_exists "${SERIAL}"; then
+    bashio::log.fatal "Serial device ${SERIAL} does not exist."
+    bashio::log.fatal "Check Settings > System > Hardware for the correct path."
+    bashio::log.fatal "Prefer a /dev/serial/by-id/... path; /dev/ttyUSB0 can change across reboots."
+    bashio::exit.nok
+fi
+
+MQTT_ARGS=()
+if bashio::config.true 'mqtt_enabled'; then
+    # Prefer explicitly configured broker settings; otherwise take whatever the
+    # Home Assistant MQTT service hands us, which is the normal case when the
+    # Mosquitto add-on is running.
+    if bashio::config.has_value 'mqtt_host'; then
+        MQTT_HOST=$(bashio::config 'mqtt_host')
+        MQTT_PORT=$(bashio::config 'mqtt_port' '1883')
+        MQTT_USERNAME=$(bashio::config 'mqtt_username' '')
+        MQTT_PASSWORD=$(bashio::config 'mqtt_password' '')
+    elif bashio::services.available 'mqtt'; then
+        MQTT_HOST=$(bashio::services 'mqtt' 'host')
+        MQTT_PORT=$(bashio::services 'mqtt' 'port')
+        MQTT_USERNAME=$(bashio::services 'mqtt' 'username')
+        MQTT_PASSWORD=$(bashio::services 'mqtt' 'password')
+    else
+        bashio::log.warning "MQTT is enabled but no broker is configured and the"
+        bashio::log.warning "Home Assistant MQTT service is unavailable."
+        bashio::log.warning "Install the Mosquitto add-on or set mqtt_host."
+    fi
+
+    if bashio::var.has_value "${MQTT_HOST:-}"; then
+        bashio::log.info "Publishing Home Assistant discovery to ${MQTT_HOST}:${MQTT_PORT}"
+        MQTT_ARGS+=(
+            "-mqtt-broker=${MQTT_HOST}:${MQTT_PORT}"
+            "-mqtt-username=${MQTT_USERNAME}"
+            "-mqtt-password=${MQTT_PASSWORD}"
+            "-mqtt-discovery-prefix=${DISCOVERY_PREFIX}"
+            "-mqtt-topic-prefix=${TOPIC_PREFIX}"
+            "-mqtt-node-id=${NODE_ID}"
+            "-mqtt-device-name=${DEVICE_NAME}"
+        )
+    fi
+else
+    bashio::log.info "MQTT disabled; the web UI and JSON API remain available."
+fi
+
+bashio::log.info "Starting Infinitive on ${SERIAL}"
+
+# exec so the daemon becomes the service process and receives SIGTERM directly,
+# letting it mark its MQTT entities offline and drain HTTP before exiting.
+exec /usr/bin/infinitive \
+    -serial="${SERIAL}" \
+    -httpport=8080 \
+    -loglevel="${LOG_LEVEL}" \
+    -zone="${ZONE}" \
+    -min-setpoint="${MIN_SETPOINT}" \
+    -max-setpoint="${MAX_SETPOINT}" \
+    -min-setpoint-spread="${MIN_SPREAD}" \
+    "${MQTT_ARGS[@]}"

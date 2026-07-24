@@ -1,0 +1,8 @@
+# Go build output. The daemon binary is produced inside the Docker build stage,
+# never committed.
+/infinitive/daemon/infinitive
+/infinitive/daemon/infinitive.exe
+*.test
+*.out
+
+.DS_Store

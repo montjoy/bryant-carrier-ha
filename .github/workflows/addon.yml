@@ -1,0 +1,43 @@
+name: Add-on
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint add-on config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Validates config.yaml against the Supervisor's own schema, which catches
+      # things like an unknown option type or a malformed schema entry before
+      # anyone tries to install the add-on.
+      - uses: frenck/action-addon-linter@v2
+        with:
+          path: ./infinitive
+
+  build:
+    name: Build ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [aarch64, amd64, armv7, armhf, i386]
+    steps:
+      - uses: actions/checkout@v4
+
+      # --test builds without pushing, which is all that is needed here: the
+      # add-on has no `image:` key, so the Supervisor builds it locally on the
+      # user's machine at install time.  This job exists to catch a broken
+      # Dockerfile before that happens.
+      - name: Build add-on image
+        uses: home-assistant/builder@master
+        with:
+          args: |
+            --test \
+            --${{ matrix.arch }} \
+            --target /data/infinitive

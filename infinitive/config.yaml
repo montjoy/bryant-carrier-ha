@@ -1,0 +1,84 @@
+---
+# Home Assistant add-on manifest.
+#
+# This replaces the legacy config.json from ha_infinitive, which among other
+# things declared `devices` twice -- the second declaration silently won, so the
+# USB mappings in the first were never applied.
+name: Infinitive
+version: "0.1.0"
+slug: infinitive
+description: >-
+  Carrier/Bryant Infinity and Evolution HVAC control over the ABCD bus, with
+  automatic Home Assistant discovery via MQTT.
+url: https://github.com/montjoy/infinitive-ha
+arch:
+  - aarch64
+  - amd64
+  - armv7
+  - armhf
+  - i386
+
+# Requires Home Assistant new enough for the MQTT discovery keys used here.
+homeassistant: "2024.1.0"
+
+# services: the daemon should come up after the broker but does not need to hold
+# up the rest of the system.
+startup: services
+boot: auto
+init: false
+
+# Declaring the MQTT service means Home Assistant hands us broker credentials
+# automatically, so the add-on needs no MQTT configuration in the common case.
+services:
+  - mqtt:need
+
+# uart maps the host's serial devices in and exposes the /dev/serial/by-id
+# symlinks, which are the stable way to name a USB adapter.
+uart: true
+usb: true
+
+ingress: true
+ingress_port: 8080
+panel_icon: mdi:hvac
+panel_title: Infinitive
+
+# Also published on the host so the JSON API stays reachable from outside Home
+# Assistant.  Set to null in the UI to keep it internal-only.
+ports:
+  8080/tcp: 8080
+ports_description:
+  8080/tcp: Infinitive web UI and JSON API
+
+options:
+  # /dev/ttyUSB0 is not stable across reboots or replug.  Prefer the by-id path,
+  # which you can find under Settings > System > Hardware > All Hardware.
+  serial: /dev/ttyUSB0
+  log_level: info
+  zone: 1
+  min_setpoint: 45
+  max_setpoint: 95
+  min_setpoint_spread: 2
+  device_name: Infinitive Thermostat
+  mqtt_enabled: true
+  discovery_prefix: homeassistant
+  topic_prefix: infinitive
+  node_id: infinitive
+
+schema:
+  serial: str
+  log_level: list(trace|debug|info|warn|error)
+  zone: int(1,8)
+  min_setpoint: int(35,95)
+  max_setpoint: int(45,105)
+  min_setpoint_spread: int(0,10)
+  device_name: str
+  mqtt_enabled: bool
+  discovery_prefix: str
+  topic_prefix: str
+  node_id: str
+  # Optional manual broker settings.  Leave unset to use the broker Home
+  # Assistant supplies through the mqtt service above.
+  mqtt_host: str?
+  mqtt_port: port?
+  mqtt_username: str?
+  mqtt_password: password?
