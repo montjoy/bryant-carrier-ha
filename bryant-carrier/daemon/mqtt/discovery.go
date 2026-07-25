@@ -38,7 +38,7 @@ type availabilityRef struct {
 // integration's mode-dependent behaviour without needing custom code.
 type climateDiscovery struct {
 	// Name is deliberately null so the entity takes the device's name rather
-	// than ending up as "Infinitive Thermostat Thermostat".
+	// than doubling it up, e.g. "Bryant/Carrier HVAC Thermostat".
 	Name     *string `json:"name"`
 	UniqueID string  `json:"unique_id"`
 	ObjectID string  `json:"object_id,omitempty"`

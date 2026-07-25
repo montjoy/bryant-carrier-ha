@@ -17,7 +17,7 @@ jobs:
       # anyone tries to install the add-on.
       - uses: frenck/action-addon-linter@v2
         with:
-          path: ./infinitive
+          path: ./bryant-carrier
 
   build:
     name: Build ${{ matrix.arch }}
@@ -40,4 +40,4 @@ jobs:
           args: |
             --test \
             --${{ matrix.arch }} \
-            --target /data/infinitive
+            --target /data/bryant-carrier

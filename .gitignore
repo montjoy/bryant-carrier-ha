@@ -1,7 +1,8 @@
-# Go build output. The daemon binary is produced inside the Docker build stage,
-# never committed.
-/infinitive/daemon/infinitive
-/infinitive/daemon/infinitive.exe
+# Local `go build` output. Named after the package directory, so `daemon`.
+# The shipped binary is produced inside the Docker build stage and installed as
+# /usr/bin/infinitive; it is never committed.
+/bryant-carrier/daemon/daemon
+/bryant-carrier/daemon/daemon.exe
 *.test
 *.out
 

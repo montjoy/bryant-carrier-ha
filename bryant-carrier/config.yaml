@@ -4,9 +4,9 @@
 # This replaces the legacy config.json from ha_infinitive, which among other
 # things declared `devices` twice -- the second declaration silently won, so the
 # USB mappings in the first were never applied.
-name: Infinitive
+name: Bryant/Carrier HVAC
 version: "0.1.0"
-slug: infinitive
+slug: bryant-carrier
 description: >-
   Carrier/Bryant Infinity and Evolution HVAC control over the ABCD bus, with
   automatic Home Assistant discovery via MQTT.
@@ -40,14 +40,14 @@ usb: true
 ingress: true
 ingress_port: 8080
 panel_icon: mdi:hvac
-panel_title: Infinitive
+panel_title: HVAC
 
 # Also published on the host so the JSON API stays reachable from outside Home
 # Assistant.  Set to null in the UI to keep it internal-only.
 ports:
   8080/tcp: 8080
 ports_description:
-  8080/tcp: Infinitive web UI and JSON API
+  8080/tcp: Web UI and JSON API
 
 options:
   # /dev/ttyUSB0 is not stable across reboots or replug.  Prefer the by-id path,
@@ -58,11 +58,11 @@ options:
   min_setpoint: 45
   max_setpoint: 95
   min_setpoint_spread: 2
-  device_name: Infinitive Thermostat
+  device_name: Bryant/Carrier HVAC
   mqtt_enabled: true
   discovery_prefix: homeassistant
-  topic_prefix: infinitive
-  node_id: infinitive
+  topic_prefix: bryant_carrier
+  node_id: bryant_carrier
 
 schema:
   serial: str

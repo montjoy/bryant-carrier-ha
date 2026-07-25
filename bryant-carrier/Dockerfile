@@ -33,14 +33,14 @@ COPY rootfs /
 
 RUN chmod a+x \
   /usr/bin/infinitive \
-  /etc/s6-overlay/s6-rc.d/infinitive/run \
-  /etc/s6-overlay/s6-rc.d/infinitive/finish
+  /etc/s6-overlay/s6-rc.d/bryant-carrier/run \
+  /etc/s6-overlay/s6-rc.d/bryant-carrier/finish
 
 # Labels are what the Supervisor reads back to identify the built image.
 ARG BUILD_ARCH
 ARG BUILD_DATE
 ARG BUILD_DESCRIPTION="Carrier/Bryant Infinity control with Home Assistant MQTT discovery"
-ARG BUILD_NAME="Infinitive"
+ARG BUILD_NAME="Bryant/Carrier HVAC"
 ARG BUILD_REF
 ARG BUILD_REPOSITORY
 ARG BUILD_VERSION

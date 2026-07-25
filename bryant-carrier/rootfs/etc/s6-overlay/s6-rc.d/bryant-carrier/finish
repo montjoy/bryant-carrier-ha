@@ -8,7 +8,7 @@
 readonly exit_code_container=$(</run/s6-linux-init-container-results/exit)
 readonly exit_code_service="${1}"
 readonly exit_code_signal="${2}"
-readonly service="infinitive"
+readonly service="bryant-carrier"
 
 bashio::log.info \
     "Service ${service} exited with code ${exit_code_service}" \

@@ -3,11 +3,11 @@ name: Daemon
 on:
   push:
     paths:
-      - "infinitive/daemon/**"
+      - "bryant-carrier/daemon/**"
       - ".github/workflows/daemon.yml"
   pull_request:
     paths:
-      - "infinitive/daemon/**"
+      - "bryant-carrier/daemon/**"
       - ".github/workflows/daemon.yml"
   workflow_dispatch:
 
@@ -16,14 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: infinitive/daemon
+        working-directory: bryant-carrier/daemon
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: infinitive/daemon/go.mod
-          cache-dependency-path: infinitive/daemon/go.sum
+          go-version-file: bryant-carrier/daemon/go.mod
+          cache-dependency-path: bryant-carrier/daemon/go.sum
 
       - name: Check formatting
         run: |

@@ -35,13 +35,13 @@ and needs nothing on the Home Assistant side.
    https://github.com/montjoy/bryant-carrier-ha
    ```
 
-2. Install **Infinitive** from the store.
+2. Install **Bryant/Carrier HVAC**, which now appears in the store.
 3. Install the **Mosquitto broker** add-on and set up the **MQTT** integration
    if you have not already.
 4. Set the `serial` option to your adapter's `/dev/serial/by-id/...` path and
    start it.
 
-Full option reference and wiring notes are in [the add-on docs](infinitive/DOCS.md).
+Full option reference and wiring notes are in [the add-on docs](bryant-carrier/DOCS.md).
 
 ### Migrating from `montjoy/ha_infinitive`
 
@@ -55,7 +55,7 @@ custom component, delete `custom_components/infinitive` and remove the
 
 ```
 repository.yaml           # marks this repo as an add-on repository
-infinitive/               # the add-on
+bryant-carrier/           # the add-on; directory name matches its slug
 ├─ config.yaml
 ├─ build.yaml
 ├─ Dockerfile             # multi-stage: golang builder -> HA base image
@@ -133,7 +133,7 @@ The daemon's HTTP API remains available on port 8080 for scripting.
 ## Development
 
 ```
-cd infinitive/daemon
+cd bryant-carrier/daemon
 go test ./...
 go build .
 ```

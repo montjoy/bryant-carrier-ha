@@ -17,7 +17,7 @@ import (
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/infinity"
+	"github.com/montjoy/bryant-carrier-ha/bryant-carrier/daemon/infinity"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -81,11 +81,14 @@ type Config struct {
 
 func DefaultConfig() Config {
 	return Config{
-		DiscoveryPrefix:   "homeassistant",
-		TopicPrefix:       "infinitive",
-		NodeID:            "infinitive",
-		DeviceName:        "Infinitive Thermostat",
-		ClientID:          "infinitive",
+		DiscoveryPrefix: "homeassistant",
+		TopicPrefix:     "bryant_carrier",
+		// NodeID becomes part of every entity's object id and the Home Assistant
+		// device identifier, so it uses underscores rather than hyphens to match
+		// entity id conventions: climate.bryant_carrier_thermostat.
+		NodeID:            "bryant_carrier",
+		DeviceName:        "Bryant/Carrier HVAC",
+		ClientID:          "bryant_carrier",
 		Zone:              1,
 		MinSetpoint:       45,
 		MaxSetpoint:       95,

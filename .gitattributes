@@ -9,6 +9,6 @@
 *.ico binary
 
 # s6-rc reads these literally; they have no extension to match on.
-infinitive/rootfs/etc/s6-overlay/s6-rc.d/**/type text eol=lf
-infinitive/rootfs/etc/s6-overlay/s6-rc.d/**/run text eol=lf
-infinitive/rootfs/etc/s6-overlay/s6-rc.d/**/finish text eol=lf
+bryant-carrier/rootfs/etc/s6-overlay/s6-rc.d/**/type text eol=lf
+bryant-carrier/rootfs/etc/s6-overlay/s6-rc.d/**/run text eol=lf
+bryant-carrier/rootfs/etc/s6-overlay/s6-rc.d/**/finish text eol=lf

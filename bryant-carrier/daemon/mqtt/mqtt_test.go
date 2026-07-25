@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/infinity"
+	"github.com/montjoy/bryant-carrier-ha/bryant-carrier/daemon/infinity"
 )
 
 func boolPtr(b bool) *bool { return &b }
@@ -251,15 +251,15 @@ func TestNormalizeBroker(t *testing.T) {
 }
 
 func TestTopicLayout(t *testing.T) {
-	b := &Bridge{cfg: Config{TopicPrefix: "infinitive", NodeID: "infinitive", DiscoveryPrefix: "homeassistant"}}
+	b := &Bridge{cfg: Config{TopicPrefix: "bryant_carrier", NodeID: "bryant_carrier", DiscoveryPrefix: "homeassistant"}}
 
 	cases := map[string]string{
-		b.stateTopic():                            "infinitive/infinitive/state",
-		b.availabilityTopic():                     "infinitive/infinitive/availability",
-		b.sourceAvailabilityTopic("heatpump"):     "infinitive/infinitive/heatpump/availability",
-		b.commandTopic("mode"):                    "infinitive/infinitive/set/mode",
-		b.discoveryTopic("climate", "thermostat"): "homeassistant/climate/infinitive/thermostat/config",
-		b.discoveryTopic("sensor", "blower_rpm"):  "homeassistant/sensor/infinitive/blower_rpm/config",
+		b.stateTopic():                            "bryant_carrier/bryant_carrier/state",
+		b.availabilityTopic():                     "bryant_carrier/bryant_carrier/availability",
+		b.sourceAvailabilityTopic("heatpump"):     "bryant_carrier/bryant_carrier/heatpump/availability",
+		b.commandTopic("mode"):                    "bryant_carrier/bryant_carrier/set/mode",
+		b.discoveryTopic("climate", "thermostat"): "homeassistant/climate/bryant_carrier/thermostat/config",
+		b.discoveryTopic("sensor", "blower_rpm"):  "homeassistant/sensor/bryant_carrier/blower_rpm/config",
 	}
 	for got, want := range cases {
 		if got != want {

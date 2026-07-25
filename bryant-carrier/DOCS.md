@@ -1,8 +1,11 @@
-# Infinitive
+# Bryant/Carrier HVAC
 
 Controls a Carrier Infinity or Bryant Evolution HVAC system by impersonating a
 SAM on the ABCD (RS-485) bus, and publishes the thermostat to Home Assistant
 over MQTT discovery — no custom component required.
+
+Built on the [Infinitive](https://github.com/acd/infinitive) daemon, which is
+compiled from source bundled in this repository.
 
 ## Before you start
 
@@ -38,11 +41,11 @@ preferred; several people have reported flaky communication with stranded core.
 | `min_setpoint` | `45` | Lowest temperature Home Assistant will offer. |
 | `max_setpoint` | `95` | Highest temperature Home Assistant will offer. |
 | `min_setpoint_spread` | `2` | Smallest gap kept between the heat and cool setpoints. Setting one close to the other pushes the other out of the way rather than letting the equipment silently override the request. |
-| `device_name` | `Infinitive Thermostat` | Device name in Home Assistant. |
+| `device_name` | `Bryant/Carrier HVAC` | Device name in Home Assistant. Purely cosmetic — safe to change at any time. |
 | `mqtt_enabled` | `true` | Turn off to run the web UI and JSON API only. |
 | `discovery_prefix` | `homeassistant` | Only change this if you changed it in the MQTT integration. |
-| `topic_prefix` | `infinitive` | Root of this add-on's own state and command topics. |
-| `node_id` | `infinitive` | Namespaces the entities and forms the device identifier. **Changing this creates a new device** and orphans the old one. |
+| `topic_prefix` | `bryant_carrier` | Root of this add-on's own state and command topics. |
+| `node_id` | `bryant_carrier` | Namespaces the entities and forms the device identifier — you get `climate.bryant_carrier_thermostat`. **Changing this creates a new device** and orphans the old one, so pick it before you first start the add-on. |
 | `mqtt_host` | *(unset)* | Only needed for a broker Home Assistant does not know about. |
 | `mqtt_port` | `1883` | |
 | `mqtt_username` | *(unset)* | |
