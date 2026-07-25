@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/infinity"
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/mqtt"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/infinity"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/mqtt"
 	log "github.com/sirupsen/logrus"
 )
 

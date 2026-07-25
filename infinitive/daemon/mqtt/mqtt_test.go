@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/infinity"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/infinity"
 )
 
 func boolPtr(b bool) *bool { return &b }

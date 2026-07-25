@@ -1,4 +1,4 @@
-# infinitive-ha
+# bryant-carrier-ha
 
 Carrier Infinity / Bryant Evolution HVAC control for Home Assistant, as a single
 Home Assistant add-on.
@@ -32,7 +32,7 @@ and needs nothing on the Home Assistant side.
 1. **Settings → Add-ons → Add-on Store**, then ⋮ → **Repositories**, and add:
 
    ```
-   https://github.com/montjoy/infinitive-ha
+   https://github.com/montjoy/bryant-carrier-ha
    ```
 
 2. Install **Infinitive** from the store.

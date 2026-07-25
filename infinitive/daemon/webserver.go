@@ -14,8 +14,8 @@ import (
 	"golang.org/x/net/websocket"
 
 	"github.com/gin-gonic/gin"
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/infinity"
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/internal/assets"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/infinity"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/internal/assets"
 	log "github.com/sirupsen/logrus"
 )
 

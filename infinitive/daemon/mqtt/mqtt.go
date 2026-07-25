@@ -17,7 +17,7 @@ import (
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/infinity"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/infinity"
 	log "github.com/sirupsen/logrus"
 )
 

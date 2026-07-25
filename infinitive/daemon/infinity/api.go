@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/internal/cache"
-	"github.com/montjoy/infinitive-ha/infinitive/daemon/internal/dispatcher"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/internal/cache"
+	"github.com/montjoy/bryant-carrier-ha/infinitive/daemon/internal/dispatcher"
 	log "github.com/sirupsen/logrus"
 )
 

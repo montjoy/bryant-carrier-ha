@@ -1,4 +1,4 @@
-module github.com/montjoy/infinitive-ha/infinitive/daemon
+module github.com/montjoy/bryant-carrier-ha/infinitive/daemon
 
 go 1.24.0
 
