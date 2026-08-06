@@ -7,3 +7,6 @@
 *.out
 
 .DS_Store
+
+# Git Bash leaves these behind when a shell crashes on Windows.
+*.stackdump
