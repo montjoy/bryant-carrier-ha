@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.4
+
+- Test the configured serial device with `-c` instead of
+  `bashio::fs.device_exists`. The helper does not test for a character device,
+  so it rejected every serial port this add-on exists to open: the add-on
+  refused to start on a `/dev/ttyUSB0` that `ls` reported in the same breath as
+  `crw-rw---- 188, 0`. This is the cause of the "Serial device ... does not
+  exist" failures in 0.1.0 through 0.1.3, and no configuration change worked
+  around it.
+- Drop the `devices:` entry added in 0.1.3 and the by-id symlink resolution
+  along with it. Both addressed a mapping problem that turned out not to exist
+  — `uart: true` had been mapping every device correctly all along — and the
+  `devices:` path hardcoded one adapter's serial number, which would not exist
+  on anyone else's host.
+
 ## 0.1.3
 
 - Map the adapter explicitly with `devices:` so the Supervisor passes it with

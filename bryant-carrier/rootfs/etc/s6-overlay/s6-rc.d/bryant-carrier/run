@@ -25,24 +25,16 @@ DISCOVERY_PREFIX=$(bashio::config 'discovery_prefix')
 TOPIC_PREFIX=$(bashio::config 'topic_prefix')
 NODE_ID=$(bashio::config 'node_id')
 
-# Follow a by-id symlink down to the node it names.  The Supervisor does not
-# always map a symlink's target alongside it, and a link that resolves to
-# nothing fails to open exactly like a missing adapter.  Resolving here lets the
-# option keep the stable by-id path -- which is the one worth configuring, since
-# it survives a replug -- while the daemon is handed a node it can open.
-if [[ -L "${SERIAL}" ]] && [[ ! -c "${SERIAL}" ]]; then
-    RESOLVED=$(readlink -f "${SERIAL}" 2>/dev/null || true)
-    if [[ -n "${RESOLVED}" ]] && [[ -c "${RESOLVED}" ]]; then
-        bashio::log.info "Resolved ${SERIAL}"
-        bashio::log.info "to ${RESOLVED}"
-        SERIAL="${RESOLVED}"
-    fi
-fi
-
 # Fail loudly and early rather than letting the daemon panic on an open() of a
 # device that is not there.  A renumbered /dev/ttyUSB* is the single most common
 # way this add-on stops working after a reboot.
-if ! bashio::fs.device_exists "${SERIAL}"; then
+#
+# -c rather than bashio::fs.device_exists, which refused to start the add-on on
+# a /dev/ttyUSB0 that ls reported in the same breath as crw-rw---- 188, 0.  The
+# helper does not test for a character device, so it rejected every serial port
+# this add-on exists to open.  -c follows symlinks, so a /dev/serial/by-id/...
+# path passes on the strength of whatever node it names.
+if [[ ! -c "${SERIAL}" ]]; then
     bashio::log.fatal "Serial device ${SERIAL} does not exist."
 
     # Escaped, so a stray character that survived the trim above is visible
