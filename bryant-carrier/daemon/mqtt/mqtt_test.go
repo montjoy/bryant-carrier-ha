@@ -250,6 +250,60 @@ func TestNormalizeBroker(t *testing.T) {
 	}
 }
 
+// TestAutoModeGatesHeatCool covers equipment that cannot change over between
+// heating and cooling on its own.  Offering heat_cool there gives Home
+// Assistant a mode that can be selected and is then ignored, which looks
+// identical to a broken integration.
+func TestAutoModeGatesHeatCool(t *testing.T) {
+	has := func(modes []string, want string) bool {
+		for _, m := range modes {
+			if m == want {
+				return true
+			}
+		}
+		return false
+	}
+
+	t.Run("offered when auto is enabled", func(t *testing.T) {
+		b := &Bridge{cfg: Config{AutoMode: true}}
+		if modes := b.climatePayload().Modes; !has(modes, haModeHeatCool) {
+			t.Errorf("modes = %v, want %q present", modes, haModeHeatCool)
+		}
+	})
+
+	t.Run("withheld when auto is disabled", func(t *testing.T) {
+		b := &Bridge{cfg: Config{AutoMode: false}}
+		modes := b.climatePayload().Modes
+		if has(modes, haModeHeatCool) {
+			t.Errorf("modes = %v, want %q absent", modes, haModeHeatCool)
+		}
+		// Withholding one mode must not drop the rest.
+		for _, want := range []string{"off", "heat", "cool"} {
+			if !has(modes, want) {
+				t.Errorf("modes = %v, want %q present", modes, want)
+			}
+		}
+	})
+
+	t.Run("a thermostat left in auto is not published as heat_cool", func(t *testing.T) {
+		b := &Bridge{cfg: Config{AutoMode: false}}
+		s := b.buildState(&infinity.TStatZoneConfig{
+			Mode: "auto", HeatSetpoint: 68, CoolSetpoint: 76,
+			CurrentTemp: 71, Hold: boolPtr(false),
+		}, infinity.AirHandler{}, false, infinity.HeatPump{}, false)
+		if s.Mode != "" {
+			t.Errorf("mode = %q, want empty so the entity keeps its last known mode", s.Mode)
+		}
+	})
+
+	t.Run("a command for a withheld mode is rejected", func(t *testing.T) {
+		b := &Bridge{cfg: Config{AutoMode: false}}
+		if err := b.setMode(haModeHeatCool); err == nil {
+			t.Error("setMode(heat_cool) should fail when auto mode is disabled")
+		}
+	})
+}
+
 func TestTopicLayout(t *testing.T) {
 	b := &Bridge{cfg: Config{TopicPrefix: "bryant_carrier", NodeID: "bryant_carrier", DiscoveryPrefix: "homeassistant"}}
 

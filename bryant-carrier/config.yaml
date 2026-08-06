@@ -5,7 +5,7 @@
 # things declared `devices` twice -- the second declaration silently won, so the
 # USB mappings in the first were never applied.
 name: Bryant/Carrier HVAC
-version: "0.1.5"
+version: "0.1.6"
 slug: bryant-carrier
 description: >-
   Carrier/Bryant Infinity and Evolution HVAC control over the ABCD bus, with
@@ -58,6 +58,10 @@ options:
   min_setpoint: 45
   max_setpoint: 95
   min_setpoint_spread: 2
+  # Set false where the equipment cannot change over between heating and cooling
+  # on its own.  The heat_cool mode is then not offered at all, rather than being
+  # selectable and ignored.
+  auto_mode: true
   device_name: Bryant/Carrier HVAC
   mqtt_enabled: true
   discovery_prefix: homeassistant
@@ -71,6 +75,7 @@ schema:
   min_setpoint: int(35,95)
   max_setpoint: int(45,105)
   min_setpoint_spread: int(0,10)
+  auto_mode: bool
   device_name: str
   mqtt_enabled: bool
   discovery_prefix: str

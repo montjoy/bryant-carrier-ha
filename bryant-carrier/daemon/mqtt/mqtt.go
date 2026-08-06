@@ -30,6 +30,11 @@ const (
 	presetHold = "hold"
 	presetNone = "none"
 
+	// haModeHeatCool is Home Assistant's name for the thermostat's auto mode.
+	// It is only offered when the equipment can change over on its own; see
+	// Config.AutoMode.
+	haModeHeatCool = "heat_cool"
+
 	// payloadNone is the literal Home Assistant treats as "clear this value".
 	// It is how a setpoint that does not apply to the current mode is hidden.
 	payloadNone = "None"
@@ -77,6 +82,12 @@ type Config struct {
 	// other setpoint here keeps Home Assistant and the thermostat in agreement
 	// instead of letting the thermostat silently override what was requested.
 	MinSetpointSpread uint8
+
+	// AutoMode offers the thermostat's auto mode, which Home Assistant calls
+	// heat_cool, as a selectable mode.  Not every installation can change over
+	// between heating and cooling on its own, and offering the mode there
+	// invites selecting one the equipment will not act on.
+	AutoMode bool
 }
 
 func DefaultConfig() Config {
@@ -93,6 +104,7 @@ func DefaultConfig() Config {
 		MinSetpoint:       45,
 		MaxSetpoint:       95,
 		MinSetpointSpread: 2,
+		AutoMode:          true,
 	}
 }
 
@@ -392,13 +404,16 @@ func (b *Bridge) buildState(
 		Stage:              int(cfg.Stage),
 	}
 
-	// An unrecognized mode leaves the field out entirely.  The template then
-	// renders empty, which Home Assistant ignores, so the entity keeps its last
-	// known mode rather than being told something wrong.
-	if mode, ok := haMode(cfg.Mode); ok {
-		s.Mode = mode
-	} else {
+	// A mode the entity was not told about leaves the field out entirely.  The
+	// template then renders empty, which Home Assistant ignores, so the entity
+	// keeps its last known mode rather than being told something it will reject.
+	switch mode, ok := haMode(cfg.Mode); {
+	case !ok:
 		log.Warnf("unrecognized thermostat mode %q, not publishing mode", cfg.Mode)
+	case mode == haModeHeatCool && !b.cfg.AutoMode:
+		log.Warnf("thermostat is in auto but auto mode is disabled, not publishing mode")
+	default:
+		s.Mode = mode
 	}
 
 	if fan, ok := haFanMode(cfg.FanMode); ok {
@@ -497,7 +512,7 @@ func haMode(mode string) (string, bool) {
 	case "off", "heat", "cool":
 		return mode, true
 	case "auto":
-		return "heat_cool", true
+		return haModeHeatCool, true
 	case "electric", "heatpump":
 		// Read-only selections made at the physical thermostat ("electric heat
 		// only" / "heat pump only").  The old integration let these fall
@@ -514,7 +529,7 @@ func infinitiveMode(mode string) (string, bool) {
 	switch mode {
 	case "off", "heat", "cool":
 		return mode, true
-	case "heat_cool", "auto":
+	case haModeHeatCool, "auto":
 		return "auto", true
 	default:
 		return "", false
@@ -583,6 +598,11 @@ func (b *Bridge) setMode(payload string) error {
 	mode, ok := infinitiveMode(payload)
 	if !ok {
 		return fmt.Errorf("unsupported hvac mode %q", payload)
+	}
+	// Discovery leaves heat_cool out when auto is disabled, so this only catches
+	// a command sent by hand or by an entity that predates the setting.
+	if mode == "auto" && !b.cfg.AutoMode {
+		return fmt.Errorf("auto mode is disabled for this system")
 	}
 	return b.api.SetZoneConfig(b.cfg.Zone, infinity.ZoneUpdate{Mode: &mode})
 }

@@ -20,6 +20,7 @@ ZONE=$(bashio::config 'zone')
 MIN_SETPOINT=$(bashio::config 'min_setpoint')
 MAX_SETPOINT=$(bashio::config 'max_setpoint')
 MIN_SPREAD=$(bashio::config 'min_setpoint_spread')
+AUTO_MODE=$(bashio::config 'auto_mode')
 DEVICE_NAME=$(bashio::config 'device_name')
 DISCOVERY_PREFIX=$(bashio::config 'discovery_prefix')
 TOPIC_PREFIX=$(bashio::config 'topic_prefix')
@@ -125,4 +126,5 @@ exec /usr/bin/infinitive \
     -min-setpoint="${MIN_SETPOINT}" \
     -max-setpoint="${MAX_SETPOINT}" \
     -min-setpoint-spread="${MIN_SPREAD}" \
+    -auto-mode="${AUTO_MODE}" \
     "${MQTT_ARGS[@]}"

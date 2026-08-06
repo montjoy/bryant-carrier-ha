@@ -41,6 +41,8 @@ func main() {
 	maxSetpoint := flag.Uint("max-setpoint", uint(mqttCfg.MaxSetpoint), "highest settable temperature")
 	minSpread := flag.Uint("min-setpoint-spread", uint(mqttCfg.MinSetpointSpread),
 		"smallest allowed gap between the heat and cool setpoints")
+	flag.BoolVar(&mqttCfg.AutoMode, "auto-mode", mqttCfg.AutoMode,
+		"offer the thermostat's auto mode, which Home Assistant calls heat_cool")
 
 	flag.Parse()
 

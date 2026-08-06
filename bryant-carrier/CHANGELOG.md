@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.6
+
+- New `auto_mode` option, default `true`. Set it false where the equipment
+  cannot change over between heating and cooling on its own: the **Heat/Cool**
+  mode is then left out of the discovery payload entirely, so it cannot be
+  selected rather than being selected and ignored. A thermostat found in auto
+  is not published either, which leaves the entity on its last known mode
+  instead of sending Home Assistant a mode it was never told about.
+
 ## 0.1.5
 
 - Selecting Off did nothing, and the wall unit's own Off state displayed as

@@ -41,6 +41,7 @@ preferred; several people have reported flaky communication with stranded core.
 | `min_setpoint` | `45` | Lowest temperature Home Assistant will offer. |
 | `max_setpoint` | `95` | Highest temperature Home Assistant will offer. |
 | `min_setpoint_spread` | `2` | Smallest gap kept between the heat and cool setpoints. Setting one close to the other pushes the other out of the way rather than letting the equipment silently override the request. |
+| `auto_mode` | `true` | Offers the thermostat's auto mode, which Home Assistant calls **Heat/Cool**. Set false where the equipment cannot change over between heating and cooling on its own — the mode is then not offered at all, rather than being selectable and ignored. |
 | `device_name` | `Bryant/Carrier HVAC` | Device name in Home Assistant. Purely cosmetic — safe to change at any time. |
 | `mqtt_enabled` | `true` | Turn off to run the web UI and JSON API only. |
 | `discovery_prefix` | `homeassistant` | Only change this if you changed it in the MQTT integration. |

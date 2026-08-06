@@ -225,6 +225,19 @@ func (b *Bridge) climatePayload() climateDiscovery {
 	state := b.stateTopic()
 	tpl := func(field string) string { return fmt.Sprintf("{{ value_json.%s }}", field) }
 
+	// "heat_cool" is not in the documented default mode list, but the discovery
+	// schema validates this key with cv.ensure_list rather than restricting it,
+	// and heat_cool is a real HVACMode.  It is what makes the frontend draw a
+	// dual setpoint for the thermostat's auto mode.  If a future Home Assistant
+	// tightens this, "auto" is the fallback.
+	//
+	// It is omitted entirely where the equipment cannot change over on its own,
+	// so the mode cannot be selected rather than being selected and ignored.
+	modes := []string{"off", "heat", "cool"}
+	if b.cfg.AutoMode {
+		modes = append(modes, haModeHeatCool)
+	}
+
 	return climateDiscovery{
 		Name:     nil,
 		UniqueID: b.cfg.NodeID + "_thermostat",
@@ -240,12 +253,7 @@ func (b *Bridge) climatePayload() climateDiscovery {
 		TempStep:        1,
 		Precision:       1,
 
-		// "heat_cool" is not in the documented default mode list, but the
-		// discovery schema validates this key with cv.ensure_list rather than
-		// restricting it, and heat_cool is a real HVACMode.  It is what makes
-		// the frontend draw a dual setpoint for the thermostat's auto mode.  If
-		// a future Home Assistant tightens this, "auto" is the fallback.
-		Modes:             []string{"off", "heat", "cool", "heat_cool"},
+		Modes:             modes,
 		ModeStateTopic:    state,
 		ModeStateTemplate: tpl("mode"),
 		ModeCommandTopic:  b.commandTopic("mode"),
