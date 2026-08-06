@@ -60,6 +60,7 @@ bryant-carrier/           # the add-on; directory name matches its slug
 ├─ build.yaml
 ├─ Dockerfile             # multi-stage: golang builder -> HA base image
 ├─ DOCS.md
+├─ CHANGELOG.md           # rendered in the add-on's update dialog
 ├─ rootfs/                # s6 service definition
 └─ daemon/                # Go source, compiled at image build time
 ```
