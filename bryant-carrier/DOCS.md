@@ -84,6 +84,12 @@ See the repository README for the endpoints.
 The log lists the serial devices the add-on can actually see. Set `serial` to
 one of those paths.
 
+If the log lists your adapter's `by-id` path but still says it does not exist,
+the Supervisor mapped the symlink without the node it points at. The add-on
+resolves that automatically where it can; where it cannot, add the path to
+`devices:` in `config.yaml` so the Supervisor passes it with `--device`, or set
+`serial` to the `/dev/ttyUSB*` node the symlink names.
+
 If the log instead says no serial devices are mapped at all, the adapter is
 unplugged or the Supervisor has not applied this add-on's `uart`/`usb`
 settings. Confirm the host sees the adapter with `ha hardware info` from the
