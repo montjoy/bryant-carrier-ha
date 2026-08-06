@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.5
+
+- Selecting Off did nothing, and the wall unit's own Off state displayed as
+  Heat. The thermostat encodes off as `4`, not the `5` inherited from upstream
+  `acd/infinitive`, which read `4` as "heat pump only" instead. A write of `5`
+  is a well-formed frame, so the thermostat ACKed it and then ignored it, since
+  no mode matches — the system kept running with no error anywhere.
+
+  Captured on a Bryant dual-fuel system: pressing Off at the wall while in cool
+  moved byte 19 of table `003b02` from `0x01` to `0x04`, and the thermostat
+  immediately shut the furnace down over the bus.
+
+  Off now reads and writes `4`. `5` still reads as off, since upstream believed
+  it was and no system has been seen reporting it.
+
 ## 0.1.4
 
 - Test the configured serial device with `-c` instead of

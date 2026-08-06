@@ -11,9 +11,18 @@ func RawModeToString(mode uint8) string {
 	case 3:
 		return "electric" // electric heat only - fan coil system
 		// on a furnace system perhaps this is furnace only - untested
-	case 4:
-		return "heatpump" // heat pump only
-	case 5:
+	case 4, 5:
+		// 4 is off, observed rather than assumed.  Pressing Off at the wall unit
+		// of a Bryant system while in cool moved byte 19 of table 003b02 from
+		// 0x01 to 0x04, and the thermostat immediately shut the furnace down
+		// over the bus.  Upstream read 4 as "heat pump only" and 5 as off, which
+		// reported an idle system as heating -- 4 maps through to Home
+		// Assistant's "heat" -- and made off unwritable, since nothing the
+		// thermostat reports is 5.
+		//
+		// 5 is kept here because upstream believed it was off and no system has
+		// been seen reporting it.  If some variant does, off is the better guess
+		// than "unknown".
 		return "off"
 	default:
 		return "unknown"
@@ -23,8 +32,13 @@ func RawModeToString(mode uint8) string {
 // StringModeToRaw encodes a writable mode.  The ok result matters: the previous
 // version mapped anything unrecognized to 5 ("off"), so a typo in a request
 // body silently shut the system down instead of being rejected.  Note that
-// "electric" and "heatpump" are read-only -- they can be selected at the
-// physical thermostat but not written over the bus.
+// "electric" is read-only -- it can be selected at the physical thermostat but
+// not written over the bus.
+//
+// Off writes 4 rather than the 5 upstream used.  A write of 5 is a well-formed
+// frame, so the thermostat ACKs it, but no mode matches and nothing happens:
+// the system kept running with the card stuck on its previous mode.  See
+// RawModeToString for where 4 comes from.
 func StringModeToRaw(mode string) (uint8, bool) {
 	switch mode {
 	case "heat":
@@ -34,7 +48,7 @@ func StringModeToRaw(mode string) (uint8, bool) {
 	case "auto":
 		return 2, true
 	case "off":
-		return 5, true
+		return 4, true
 	default:
 		return 0, false
 	}
