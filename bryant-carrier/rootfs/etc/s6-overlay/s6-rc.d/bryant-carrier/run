@@ -10,6 +10,11 @@
 set -e
 
 SERIAL=$(bashio::config 'serial')
+# Trim stray whitespace.  The by-id paths are long enough that they are always
+# pasted rather than typed, and a leading or trailing space riding along turns
+# every filesystem test below into a false negative on a device that is present.
+SERIAL="${SERIAL#"${SERIAL%%[![:space:]]*}"}"
+SERIAL="${SERIAL%"${SERIAL##*[![:space:]]}"}"
 LOG_LEVEL=$(bashio::config 'log_level')
 ZONE=$(bashio::config 'zone')
 MIN_SETPOINT=$(bashio::config 'min_setpoint')
@@ -25,6 +30,11 @@ NODE_ID=$(bashio::config 'node_id')
 # way this add-on stops working after a reboot.
 if ! bashio::fs.device_exists "${SERIAL}"; then
     bashio::log.fatal "Serial device ${SERIAL} does not exist."
+
+    # Escaped, so a stray character that survived the trim above is visible
+    # rather than printing as an ordinary-looking path.
+    bashio::log.fatal "Configured value: $(printf '%q' "${SERIAL}")"
+    bashio::log.fatal "Which is: $(ls -ld "${SERIAL}" 2>&1)"
 
     # Listing what is actually present is the only way to tell a wrong path
     # apart from a device that never got mapped into the container at all --
@@ -42,13 +52,19 @@ if ! bashio::fs.device_exists "${SERIAL}"; then
         bashio::log.fatal "add-on store and Rebuild the add-on, then check that"
         bashio::log.fatal "'ha hardware info' lists the adapter on the host."
     else
+        # ls -ld rather than the bare path: every /dev/serial/by-id entry is a
+        # symlink, so what it points at is the part that decides whether the
+        # device is usable.  A name can appear in this list and still fail the
+        # test above, which is what a symlink whose target was not mapped into
+        # the container looks like.
         bashio::log.fatal "Serial devices visible to this add-on:"
         for dev in "${visible[@]}"; do
-            bashio::log.fatal "  ${dev}"
+            bashio::log.fatal "  $(ls -ld "${dev}" 2>&1)"
         done
-        bashio::log.fatal "Set the 'serial' option to one of the paths above."
-        bashio::log.fatal "Prefer /dev/serial/by-id/...; /dev/ttyUSB0 is assigned"
-        bashio::log.fatal "in probe order and can change across a reboot or replug."
+        bashio::log.fatal "Entries starting with 'c' are usable devices."
+        bashio::log.fatal "An entry starting with 'l' whose target is not itself"
+        bashio::log.fatal "listed above is a symlink the Supervisor mapped without"
+        bashio::log.fatal "its target; use that target's /dev/ttyUSB* path instead."
     fi
 
     bashio::exit.nok
