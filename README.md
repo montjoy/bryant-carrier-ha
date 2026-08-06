@@ -63,6 +63,7 @@ bryant-carrier/           # the add-on; directory name matches its slug
 ├─ CHANGELOG.md           # rendered in the add-on's update dialog
 ├─ rootfs/                # s6 service definition
 └─ daemon/                # Go source, compiled at image build time
+   └─ PROTOCOL.md         # ABCD bus notes: frames, tables, encodings
 ```
 
 ## What changed from upstream
