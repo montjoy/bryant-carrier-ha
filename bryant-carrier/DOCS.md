@@ -81,8 +81,15 @@ See the repository README for the endpoints.
 ## Troubleshooting
 
 **The add-on stops immediately with "Serial device ... does not exist".**
-The path in the `serial` option is wrong or the adapter is unplugged. Check
-Settings → System → Hardware.
+The log lists the serial devices the add-on can actually see. Set `serial` to
+one of those paths.
+
+If the log instead says no serial devices are mapped at all, the adapter is
+unplugged or the Supervisor has not applied this add-on's `uart`/`usb`
+settings. Confirm the host sees the adapter with `ha hardware info` from the
+SSH add-on, then reload the add-on store (⋮ → Check for updates) and use
+**Rebuild** on the add-on page — a plain Restart reuses the existing container
+and its existing device mappings.
 
 **No frames in the log.** A and B are probably swapped — harmless, just swap
 them back. Also confirm you are on A/B and not C/D.

@@ -25,8 +25,32 @@ NODE_ID=$(bashio::config 'node_id')
 # way this add-on stops working after a reboot.
 if ! bashio::fs.device_exists "${SERIAL}"; then
     bashio::log.fatal "Serial device ${SERIAL} does not exist."
-    bashio::log.fatal "Check Settings > System > Hardware for the correct path."
-    bashio::log.fatal "Prefer a /dev/serial/by-id/... path; /dev/ttyUSB0 can change across reboots."
+
+    # Listing what is actually present is the only way to tell a wrong path
+    # apart from a device that never got mapped into the container at all --
+    # there is no way to exec into an add-on from the SSH add-on to check by
+    # hand.  An empty list means the Supervisor mapped nothing, which is a
+    # different problem from a typo in the option.
+    shopt -s nullglob
+    visible=(/dev/ttyUSB* /dev/ttyACM* /dev/ttyAMA* /dev/serial/by-id/*)
+    shopt -u nullglob
+
+    if [[ ${#visible[@]} -eq 0 ]]; then
+        bashio::log.fatal "No serial devices are mapped into this add-on."
+        bashio::log.fatal "The adapter is unplugged, or the Supervisor has not"
+        bashio::log.fatal "applied this add-on's uart/usb settings.  Reload the"
+        bashio::log.fatal "add-on store and Rebuild the add-on, then check that"
+        bashio::log.fatal "'ha hardware info' lists the adapter on the host."
+    else
+        bashio::log.fatal "Serial devices visible to this add-on:"
+        for dev in "${visible[@]}"; do
+            bashio::log.fatal "  ${dev}"
+        done
+        bashio::log.fatal "Set the 'serial' option to one of the paths above."
+        bashio::log.fatal "Prefer /dev/serial/by-id/...; /dev/ttyUSB0 is assigned"
+        bashio::log.fatal "in probe order and can change across a reboot or replug."
+    fi
+
     bashio::exit.nok
 fi
 
